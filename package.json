@@ -1,0 +1,27 @@
+{
+  "name": "dbon",
+  "version": "1.0.0",
+  "description": "A new, easier way to \"database\"",
+  "main": "dbon.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GianlucaTarantino/DBON.git"
+  },
+  "keywords": [
+    "database",
+    "json",
+    "easy",
+    "javascript",
+    "node",
+    "db"
+  ],
+  "author": "Gianluca Tarantino",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/GianlucaTarantino/DBON/issues"
+  },
+  "homepage": "https://github.com/GianlucaTarantino/DBON#readme"
+}
