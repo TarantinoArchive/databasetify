@@ -1,2 +1,2 @@
-# DBON
-A new, easier way to "database"
+# Databasetify
+A new, easier way to database
