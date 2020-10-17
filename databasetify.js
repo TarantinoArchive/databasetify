@@ -31,7 +31,7 @@ function isValidDBON(obj) {
     return true;
 }
 
-class DBON {
+class databasetify {
 
     constructor(path, mode) {
         
