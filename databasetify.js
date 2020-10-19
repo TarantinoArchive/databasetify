@@ -94,6 +94,7 @@ export class Databasetify {
     this.db = obj;
     this.tables = [];
   }
+
   /**
   * Adds a table to the currently open database.
   * @param {string} name - Name of the table.
@@ -104,7 +105,15 @@ export class Databasetify {
     if (this.mode === 0) {
       if (!(name in this.db)) {
         this.db[name] = {};
-        this.tables.push({'name': name, 'columns': columns});
+        this.tables.push({'name': name, 'columns': columns.map(
+            (v) => {
+              return (typeof v == 'string' ? v : null);
+            }).filter(
+            (v) => v != null),
+        });
+        for (const column of this.tables[tableIndex].columns) {
+          this.db[table][column] = '';
+        }
       }
     } else {
       const columnNames = []; const relations = [];
@@ -119,7 +128,7 @@ export class Databasetify {
           relations.push(null);
         }
       }
-      this.db['tables'].push({
+      this.db.tables.push({
         'name': name,
         'cols': columnNames,
         'numOfCols': columnNames.length,
@@ -132,6 +141,46 @@ export class Databasetify {
     }
 
     saveDatabase(this.db, this.path);
+  }
+  /**
+  * Adds a table to the currently open database.
+  * @param {string} table - Name of the table where you want to insert values
+  * @param {string} key - Array of columns.
+  * @param {Object.<string, any>} value - Object of values,
+  *                                       with columns' names as keys
+  */
+  insert(table, key, value) {
+    if (this.mode === 0) {
+      if (!this.db[table]) {
+        return;
+      }
+      this.db[table][key] = value;
+    } else {
+      let tableIndex = -1;
+      let count = 0;
+      for (const table of this.db.tables) {
+        if (this.table.name == table) {
+          tableIndex = count;
+        }
+        count++;
+      }
+      if (tableIndex === -1) {
+        throw Error('Table does not exist');
+      }
+      this.db.tables[tableIndex].keys.push(key);
+      this.db.tables[tableIndex].numOfKeys++;
+
+      const valueIndexArray = [];
+      for (const key of Object.keys(value)) {
+        if (key in this.db.tables[tableIndex].cols) {
+          const currentIndex = this.db.tables[tableIndex].cols.indexOf(key);
+          if (currentIndex >= 0) {
+            valueIndexArray[currentIndex] = value[key];
+          }
+        }
+      }
+      this.db.tables[tableIndex].values.push(valueIndexArray);
+    }
   }
 }
 
