@@ -143,9 +143,9 @@ export class Databasetify {
     saveDatabase(this.db, this.path);
   }
   /**
-  * Adds a table to the currently open database.
+  * Adds a value to an existent table.
   * @param {string} table - Name of the table where you want to insert values
-  * @param {string} key - Array of columns.
+  * @param {string} key - Name of the key.
   * @param {Object.<string, any>} value - Object of values,
   *                                       with columns' names as keys
   */
@@ -165,12 +165,13 @@ export class Databasetify {
         count++;
       }
       if (tableIndex === -1) {
-        throw Error('Table does not exist');
+        throw Error(`Table ${table} does not exist`);
       }
       this.db.tables[tableIndex].keys.push(key);
       this.db.tables[tableIndex].numOfKeys++;
 
       const valueIndexArray = [];
+      valueIndexArray.length = this.db.tables[tableIndex].numOfCols;
       for (const key of Object.keys(value)) {
         if (key in this.db.tables[tableIndex].cols) {
           const currentIndex = this.db.tables[tableIndex].cols.indexOf(key);
@@ -181,6 +182,62 @@ export class Databasetify {
       }
       this.db.tables[tableIndex].values.push(valueIndexArray);
     }
+
+    saveDatabase(this.db, this.path);
+  }
+  /**
+  * Set a different value given the table, the key and the column names.
+  * @param {string} table - Name of the table where you want to insert values
+  * @param {string} key - Name of the key to modify
+  * @param {string} column - Name of the column
+  * @param {any} value - Value to set at given table, key and column
+  */
+  set(table, key, column, value) {
+    if (mode === 0) {
+      if (!this.db[table]) {
+        return;
+      } else if (!this.db[table][key]) {
+        this.db[table][key] = {};
+      }
+      this.db[table][key][column] = value;
+    } else {
+      let tableIndex = -1;
+      let count = 0;
+      for (const table of this.db.tables) {
+        if (table.name == table) {
+          tableIndex = count;
+        }
+        count++;
+      }
+      if (tableIndex === -1) {
+        throw Error(`Table ${table} does not exist`);
+      }
+      let colIndex = -1;
+      count = 0;
+      for (const col of this.db.tables[tableIndex].cols) {
+        if (col == column) {
+          colIndex = count;
+        }
+        count++;
+      }
+      if (tableIndex === -1) {
+        throw Error(`Column ${column} does not exist in table ${table}`);
+      }
+      let keyIndex = -1;
+      count = 0;
+      for (const tkey of this.db.tables[tableIndex].keys) {
+        if (tkey == key) {
+          keyIndex = count;
+        }
+        count++;
+      }
+      if (tableIndex === -1) {
+        throw Error(`Key ${key} does not exist in table ${table}`);
+      }
+      this.db.tables[tableIndex].values[keyIndex][colIndex] = value;
+    }
+
+    saveDatabase(this.db, this.path);
   }
 }
 
