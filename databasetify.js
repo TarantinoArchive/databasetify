@@ -1,4 +1,3 @@
-
 const fs = require('fs');
 
 /**
@@ -56,7 +55,7 @@ function isValidDBON(obj) {
 
 // eslint-disable-next-line require-jsdoc
 async function saveDatabase(obj, path) {
-  fs.writeFile(path, JSON.stringify(obj), (err) => {
+  fs.writeFileSync(path, JSON.stringify(obj), (err) => {
     if (err) throw err;
   });
 }
@@ -67,7 +66,25 @@ async function saveDatabase(obj, path) {
  * performs operations on it adding or deleting elements
  * and finding for data
  */
-export class Databasetify {
+class Databasetify {
+  /**
+  *
+  * @callback finder
+  * @param {string} value - Currently checking value
+  * @param {string} key - Key relative to the current value
+  * @param {string} column - Column relative to the current value
+  * @param {string} counter - An increasing counter,
+  *                           from 0 to the number of values
+  */
+  /**
+  * @typedef foundValue
+  * @type {Object}
+  * @property {?any} value - Found value
+  * @property {?string} key - Key of the found value
+  * @property {?string} column - Column of the found value
+  * @property {?number} counter - Count of elements checked
+  */
+
   /**
   * Opens a file and initialize the database.
   * @param {string} path - Path of the json file to databasetify.
@@ -89,7 +106,7 @@ export class Databasetify {
       throw new Error('File is not in valid DBON format');
     }
 
-    this.mode = mode == 0 ? false : true;
+    this.mode = mode;
     this.path = path;
     this.db = obj;
     this.tables = [];
@@ -111,9 +128,6 @@ export class Databasetify {
             }).filter(
             (v) => v != null),
         });
-        for (const column of this.tables[tableIndex].columns) {
-          this.db[table][column] = '';
-        }
       }
     } else {
       const columnNames = []; const relations = [];
@@ -193,7 +207,7 @@ export class Databasetify {
   * @param {any} value - Value to set at given table, key and column
   */
   set(table, key, column, value) {
-    if (mode === 0) {
+    if (this.mode === 0) {
       if (!this.db[table]) {
         return;
       } else if (!this.db[table][key]) {
@@ -220,7 +234,7 @@ export class Databasetify {
         }
         count++;
       }
-      if (tableIndex === -1) {
+      if (colIndex === -1) {
         throw Error(`Column ${column} does not exist in table ${table}`);
       }
       let keyIndex = -1;
@@ -231,13 +245,226 @@ export class Databasetify {
         }
         count++;
       }
-      if (tableIndex === -1) {
+      if (keyIndex === -1) {
         throw Error(`Key ${key} does not exist in table ${table}`);
       }
       this.db.tables[tableIndex].values[keyIndex][colIndex] = value;
     }
 
     saveDatabase(this.db, this.path);
+  }
+  /**
+  * Removes the specified key in the specified table
+  * @param {string} table - Name of the table where you want to remove key
+  * @param {string} key - Key to remove
+  */
+  removeKey(table, key) {
+    if (this.mode === 0) {
+      delete this.db[table][key];
+    } else {
+      let tableIndex = -1;
+      let count = 0;
+      for (const table of this.db.tables) {
+        if (table.name == table) {
+          tableIndex = count;
+        }
+        count++;
+      }
+      if (tableIndex === -1) {
+        throw Error(`Table ${table} does not exist`);
+      }
+      let keyIndex = -1;
+      count = 0;
+      for (const tkey of this.db.tables[tableIndex].keys) {
+        if (tkey == key) {
+          keyIndex = count;
+        }
+        count++;
+      }
+      if (keyIndex === -1) {
+        throw Error(`Key ${key} does not exist in table ${table}`);
+      }
+      this.db.tables[tableIndex].values.splice(keyIndex, 1);
+    }
+
+    saveDatabase(this.db, this.path);
+  }
+  /**
+  * Get a value from the database, given the table name, the key and the column
+  * @param {string} table - Table of the value you want to get
+  * @param {string} key - Key of the value you want to get
+  * @param {string} column - Column of the value you want to get
+  * @return {?any} - Value at specified Table, Key and Column, if it exists.
+  *                  If not, returns null
+  */
+  get(table, key, column) {
+    if (this.mode === 0) {
+      if (!this.db[table]) {
+        return null;
+      } else if (!this.db[table][key]) {
+        return null;
+      } else if (!this.db[table][key][column]) {
+        return null;
+      }
+      return this.db[table][key][column];
+    } else {
+      let tableIndex = -1;
+      let count = 0;
+      for (const table of this.db.tables) {
+        if (table.name == table) {
+          tableIndex = count;
+        }
+        count++;
+      }
+      if (tableIndex === -1) {
+        throw Error(`Table ${table} does not exist`);
+      }
+      let colIndex = -1;
+      count = 0;
+      for (const col of this.db.tables[tableIndex].cols) {
+        if (col == column) {
+          colIndex = count;
+        }
+        count++;
+      }
+      if (colIndex === -1) {
+        throw Error(`Column ${column} does not exist in table ${table}`);
+      }
+      let keyIndex = -1;
+      count = 0;
+      for (const tkey of this.db.tables[tableIndex].keys) {
+        if (tkey == key) {
+          keyIndex = count;
+        }
+        count++;
+      }
+      if (keyIndex === -1) {
+        throw Error(`Key ${key} does not exist in table ${table}`);
+      }
+
+      return this.db.tables[tableIndex].values[keyIndex][colIndex];
+    }
+  }
+  /**
+  * Returns the first element that makes the finder function true
+  * @param {string} table - Name of the table where you want to search
+  * @param {finder} finder - The function to filter all the values
+  * @return {foundValue} Object with the value, the key, the column
+  *                      and the counter relatives to the value
+  */
+  find(table, finder) {
+    let counter = 0;
+    if (this.mode === 0) {
+      if (this.db[table]) {
+        for (const key of Object.keys(this.db[table])) {
+          for (const col of Object.keys(this.db[table][key])) {
+            if (finder(this.db[table][key][col], key, col, counter)) {
+              return {
+                value: this.db[table][key][col],
+                key: key,
+                column: col,
+                counter: counter,
+              };
+            }
+            counter++;
+          }
+        }
+      }
+      return {
+        value: null,
+        key: null,
+        column: null,
+        counter: null,
+      };
+    } else {
+      for (const table of this.db.tables) {
+        if (table.name == table) {
+          tableIndex = count;
+        }
+        count++;
+      }
+      if (tableIndex === -1) {
+        throw Error(`Table ${table} does not exist`);
+      }
+      for (let k = 0; k < this.db.tables[tableIndex].numOfKeys; k++) {
+        for (let c = 0; c < this.db.tables[tableIndex].numOfCols; c++) {
+          const value = this.db.tables[tableIndex].values[k][c];
+          const key = this.db.tables[tableIndex].keys[k];
+          const col = this.db.tables[tableIndex].cols[c];
+          if (finder(value, key, col, counter)) {
+            return {
+              value: value,
+              key: key,
+              column: col,
+              counter: counter,
+            };
+          }
+          counter++;
+        }
+      }
+      return {
+        value: null,
+        key: null,
+        column: null,
+        counter: null,
+      };
+    }
+  }
+  /**
+  * Returns all the elements that makes the finder function true
+  * @param {string} table - Name of the table where you want to search
+  * @param {finder} finder - The function to filter all the values
+  * @return {Array<foundValue>} Array of Objects with the value, the key, the
+  *                             column and the counter relatives to the value
+  */
+  findAll(table, finder) {
+    const returnArray = [];
+    let counter = 0;
+    if (this.mode === 0) {
+      if (this.db[table]) {
+        for (const key of Object.keys(this.db[table])) {
+          for (const col of Object.keys(this.db[table][key])) {
+            if (finder(this.db[table][key][col], key, col, counter)) {
+              returnArray.push({
+                value: this.db[table][key][col],
+                key: key,
+                column: col,
+                counter: counter,
+              });
+            }
+            counter++;
+          }
+        }
+      }
+      return returnArray;
+    } else {
+      for (const table of this.db.tables) {
+        if (table.name == table) {
+          tableIndex = count;
+        }
+        count++;
+      }
+      if (tableIndex === -1) {
+        throw Error(`Table ${table} does not exist`);
+      }
+      for (let k = 0; k < this.db.tables[tableIndex].numOfKeys; k++) {
+        for (let c = 0; c < this.db.tables[tableIndex].numOfCols; c++) {
+          const value = this.db.tables[tableIndex].values[k][c];
+          const key = this.db.tables[tableIndex].keys[k];
+          const col = this.db.tables[tableIndex].cols[c];
+          if (finder(value, key, col, counter)) {
+            returnArray.push({
+              value: value,
+              key: key,
+              column: col,
+              counter: counter,
+            });
+          }
+          counter++;
+        }
+      }
+      return returnArray;
+    }
   }
 }
 
