@@ -61,6 +61,18 @@ async function saveDatabase(obj, path) {
 }
 
 /**
+  * Creates a valid mode 1 database for Databasetify
+  * @param {string} name - Name you want to give to the database
+  * @param {string} path - Path of the JSON file for the database
+  */
+async function newDatabase(name, path) {
+  fs.writeFile(path, `{"name": ${name}, "numOfTables": 0, tables: []}`,
+      (err) => {
+        if (err) throw err;
+      });
+}
+
+/**
  * Main databasetify class.
  * Opens a file as a database,
  * performs operations on it adding or deleting elements
@@ -491,3 +503,8 @@ class Databasetify {
     }
   }
 }
+
+module.exports = {
+  Databasetify: Databasetify,
+  newDatabase: newDatabase,
+};
