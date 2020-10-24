@@ -66,7 +66,7 @@ async function saveDatabase(obj, path) {
   * @param {string} path - Path of the JSON file for the database
   */
 async function newDatabase(name, path) {
-  fs.writeFile(path, `{"name": ${name}, "numOfTables": 0, tables: []}`,
+  fs.writeFile(path, `{"name": "${name}", "numOfTables": 0, "tables": []}`,
       (err) => {
         if (err) throw err;
       });
