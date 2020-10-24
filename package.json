@@ -6,9 +6,14 @@
   "scripts": {
     "test": "node databasetify.js"
   },
+  "author": {
+    "name": "Gianluca Tarantino",
+    "email": "gianlutara@gmail.com",
+    "url": "https://github.com/GianlucaTarantino"
+  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/GianlucaTarantino/DBON.git"
+    "url": "git+https://github.com/GianlucaTarantino/databasetify.git"
   },
   "keywords": [
     "database",
@@ -18,7 +23,13 @@
     "node",
     "db"
   ],
-  "author": "Gianluca Tarantino",
+  "contributors": [
+    {
+      "name": "Gianluca Tarantino",
+      "email": "gianlutara@gmail.com",
+      "url": "https://github.com/GianlucaTarantino"
+    }
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/GianlucaTarantino/databasetify/issues"
@@ -27,5 +38,7 @@
   "devDependencies": {
     "eslint": "^7.11.0",
     "eslint-config-google": "^0.14.0"
-  }
+  },
+  "readme": "README.md"
+  
 }
