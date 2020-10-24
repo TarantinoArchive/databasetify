@@ -1,6 +1,7 @@
 # Databasetify
 A new, easier way to database
 
+![GitHub package.json version](https://img.shields.io/github/package-json/v/GianlucaTarantino/databasetify?style=flat-square) ![GitHub](https://img.shields.io/github/license/GianlucaTarantino/databasetify?style=flat-square) ![npm bundle size](https://img.shields.io/bundlephobia/min/databasetify?style=flat-square) ![npm bundle size](https://img.shields.io/bundlephobia/minzip/databasetify?style=flat-square) ![GitHub All Releases](https://img.shields.io/github/downloads/GianlucaTarantino/databasetify/total?style=flat-square)
 - [Description](#managing-data-has-never-been-so-easy)
 - [Features](#features)
 - [Installation](#installation)
