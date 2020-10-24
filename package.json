@@ -1,5 +1,5 @@
 {
-  "name": "databasetify",
+  "name": "@gianlucatarantino/databasetify",
   "version": "1.0.0",
   "description": "A new, easier way to database",
   "main": "databasetify.js",
@@ -40,5 +40,4 @@
     "eslint-config-google": "^0.14.0"
   },
   "readme": "README.md"
-  
 }
