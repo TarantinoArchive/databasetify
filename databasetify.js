@@ -80,13 +80,11 @@ async function newDatabase(name, path) {
  */
 class Databasetify {
   /**
-  *
-  * @callback finder
-  * @param {string} value - Currently checking value
-  * @param {string} key - Key relative to the current value
-  * @param {string} column - Column relative to the current value
-  * @param {string} counter - An increasing counter,
-  *                           from 0 to the number of values
+  * @typedef column
+  * @type {Object}
+  * @property {string} name - Name of the column
+  * @property {?relation} key - Name of the table related
+  *                             to the informations in this column
   */
   /**
   * @typedef foundValue
@@ -96,7 +94,15 @@ class Databasetify {
   * @property {?string} column - Column of the found value
   * @property {?number} counter - Count of elements checked
   */
-
+  /**
+  *
+  * @callback finder
+  * @param {string} value - Currently checking value
+  * @param {string} key - Key relative to the current value
+  * @param {string} column - Column relative to the current value
+  * @param {string} counter - An increasing counter,
+  *                           from 0 to the number of values
+  */
   /**
   * Opens a file and initialize the database.
   * @param {string} path - Path of the json file to databasetify.
@@ -127,7 +133,7 @@ class Databasetify {
   /**
   * Adds a table to the currently open database.
   * @param {string} name - Name of the table.
-  * @param {Array} columns - Array of columns.
+  * @param {Array<column>} columns - Array of columns.
   *                          Check the right structure in the documentation.
   */
   addTable(name, columns) {
