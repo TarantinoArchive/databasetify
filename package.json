@@ -1,5 +1,5 @@
 {
-  "name": "@gianlucatarantino/databasetify",
+  "name": "databasetify",
   "version": "1.0.0",
   "description": "A new, easier way to database",
   "main": "databasetify.js",
