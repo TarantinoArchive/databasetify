@@ -197,3 +197,65 @@ Returns **[Array][27]&lt;foundValue>** Array of Objects with the value, the key,
 [26]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
 
 [27]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
+
+### Database Modes
+
+**Mode 0**
+
+A simple, empty JSON file is valid for mode 0. Every table is a key in the JSON root and its value is an object. For each key of the table, there is a corresponding object, with as keys the columns of the tables and as values the corresponding values. It does not check for eventual errors, it just works.
+```json
+{
+    "table1": {
+        "key1": {
+            "col1": "value1",
+            "col2": "value2",
+            "col3": "value3"
+        },
+        "key2": {
+            "col2": "value2",
+            "col4": "value3"
+        }
+    }
+}
+```
+**Mode 1**
+
+For mode 1, you need a Databasetify structured object. This is the structure:
+```json
+{
+    "name": "databaseName",
+    "tableCount": 1,
+    "tables": [
+        {
+            "name": "tableName",
+            "cols": ["col1", "col2"]
+            "numOfCols": 2,
+            "keys": ["key1", "key2"],
+            "numOfKeys": 2,
+            "values" [
+                ["value1", "value2"],
+                ["value1", "value2"]
+            ]
+            "isRelational": false,
+            "relations": [
+                null,
+                null
+            ]
+        }
+    ]
+}
+```
+It may seem very complex, but you can create an empty mode 1 database writing: 
+```json
+{
+    "name": "databaseName",
+    "tableCount: 0,
+    "tables": []
+}
+```
+Or simply using the function newDatabase (for this, you can use the Node console)
+```javascript
+const databasetify = require("databasetify");
+databasetify.newDatabase("name", "path/to/db.json");
+```
+This mode checks for eventual structure errors.
