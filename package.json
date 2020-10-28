@@ -39,5 +39,5 @@
     "eslint": "^7.11.0",
     "eslint-config-google": "^0.14.0"
   },
-  "readme": "README.md"
+  "readme": "With Databasetify, you can have a easier alternative to all those hard things like SQL. Transform a simple JSON file in a database-like document. "
 }
